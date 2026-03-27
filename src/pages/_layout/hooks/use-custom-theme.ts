@@ -164,11 +164,23 @@ export const useCustomTheme = () => {
             secondary: setting.secondary_text || dt.secondary_text,
           },
           background: {
-            paper: dt.background_color,
+            paper: mode === 'light' ? '#FFFFFF' : '#2C2C2E',
             default: dt.background_color,
           },
         },
-        shadows: Array(25).fill('none') as Shadows,
+        shadows: [
+          'none',
+          mode === 'light'
+            ? '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)'
+            : '0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
+          mode === 'light'
+            ? '0 2px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05)'
+            : '0 2px 6px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.25)',
+          mode === 'light'
+            ? '0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05)'
+            : '0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3)',
+          ...Array(21).fill('none'),
+        ] as Shadows,
         typography: {
           fontFamily: setting.font_family
             ? `${setting.font_family}, ${dt.font_family}`
@@ -201,11 +213,13 @@ export const useCustomTheme = () => {
 
     const rootEle = document.documentElement
     if (rootEle) {
-      const backgroundColor = mode === 'light' ? '#ECECEC' : dt.background_color
+      const backgroundColor = mode === 'light' ? '#F2F2F7' : dt.background_color
       const selectColor = mode === 'light' ? '#f5f5f5' : '#3E3E3E'
       const scrollColor = mode === 'light' ? '#90939980' : '#555555'
       const dividerColor =
-        mode === 'light' ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)'
+        mode === 'light'
+          ? 'rgba(60, 60, 67, 0.12)'
+          : 'rgba(255, 255, 255, 0.08)'
       rootEle.style.setProperty('--divider-color', dividerColor)
       rootEle.style.setProperty('--background-color', backgroundColor)
       rootEle.style.setProperty('--selection-color', selectColor)
@@ -260,16 +274,19 @@ export const useCustomTheme = () => {
       const globalStyles = `
         /* 修复滚动条样式 */
         ::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-          background-color: var(--scrollbar-bg);
+          width: 6px;
+          height: 6px;
+          background-color: transparent;
         }
         ::-webkit-scrollbar-thumb {
           background-color: var(--scrollbar-thumb);
-          border-radius: 4px;
+          border-radius: 6px;
         }
         ::-webkit-scrollbar-thumb:hover {
           background-color: ${mode === 'light' ? '#a1a1a1' : '#666666'};
+        }
+        ::-webkit-scrollbar-track {
+          background-color: transparent;
         }
 
         /* 背景图处理 */
@@ -289,20 +306,14 @@ export const useCustomTheme = () => {
           }
         }
 
-        /* 修复可能的白色边框 */
-        .MuiPaper-root {
-          border-color: var(--window-border-color) !important;
-        }
-
         /* 确保模态框和对话框也使用暗色主题 */
         .MuiDialog-paper {
-          background-color: ${mode === 'light' ? '#ffffff' : '#2E303D'} !important;
+          background-color: ${mode === 'light' ? '#ffffff' : '#2C2C2E'} !important;
         }
 
-        /* 移除可能的白色点或线条 */
+        /* 移除可能的白色点或线条，但允许自定义box-shadow */
         * {
           outline: none !important;
-          box-shadow: none !important;
         }
       `
 
