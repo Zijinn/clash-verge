@@ -8,7 +8,6 @@ import {
   Box,
   Typography,
   Stack,
-  Paper,
   Tooltip,
   alpha,
   useTheme,
@@ -33,64 +32,84 @@ interface TabButtonProps {
   hasIndicator?: boolean
 }
 
-// Tab组件
+// Tab组件 — iOS segmented control style
 const TabButton: FC<TabButtonProps> = memo(
-  ({ isActive, onClick, icon: Icon, label, hasIndicator = false }) => (
-    <Paper
-      elevation={isActive ? 2 : 0}
-      onClick={onClick}
-      sx={{
-        cursor: 'pointer',
-        px: 2,
-        py: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 1,
-        bgcolor: isActive ? 'primary.main' : 'background.paper',
-        color: isActive ? 'primary.contrastText' : 'text.primary',
-        borderRadius: 1.5,
-        flex: 1,
-        maxWidth: 160,
-        transition: 'all 0.2s ease-in-out',
-        position: 'relative',
-        '&:hover': {
-          transform: 'translateY(-1px)',
-          boxShadow: 1,
-        },
-        '&:after': isActive
-          ? {
-              content: '""',
-              position: 'absolute',
-              bottom: -9,
-              left: '50%',
-              width: 2,
-              height: 9,
-              bgcolor: 'primary.main',
-              transform: 'translateX(-50%)',
-            }
-          : {},
-      }}
-    >
-      <Icon fontSize="small" />
-      <Typography variant="body2" sx={{ fontWeight: isActive ? 600 : 400 }}>
-        {label}
-      </Typography>
-      {hasIndicator && (
-        <Box
-          sx={{
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            bgcolor: isActive ? '#fff' : 'success.main',
-            position: 'absolute',
-            top: 8,
-            right: 8,
-          }}
+  ({ isActive, onClick, icon: Icon, label, hasIndicator = false }) => {
+    const theme = useTheme()
+    const isDark = theme.palette.mode === 'dark'
+
+    return (
+      <Box
+        onClick={onClick}
+        sx={{
+          cursor: 'pointer',
+          px: 1,
+          py: 0.75,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 0.75,
+          flex: 1,
+          maxWidth: 160,
+          transition: 'all 0.2s ease',
+          borderRadius: 1.5,
+          position: 'relative',
+          backgroundColor: isActive
+            ? isDark
+              ? 'rgba(255,255,255,0.15)'
+              : '#FFFFFF'
+            : 'transparent',
+          boxShadow: isActive
+            ? isDark
+              ? '0 1px 4px rgba(0,0,0,0.4)'
+              : '0 1px 4px rgba(0,0,0,0.12), 0 0.5px 0 rgba(0,0,0,0.06)'
+            : 'none',
+          color: isActive
+            ? theme.palette.primary.main
+            : theme.palette.text.secondary,
+          '&:hover': {
+            backgroundColor: isActive
+              ? isDark
+                ? 'rgba(255,255,255,0.15)'
+                : '#FFFFFF'
+              : isDark
+                ? 'rgba(255,255,255,0.06)'
+                : 'rgba(0,0,0,0.04)',
+          },
+        }}
+      >
+        <Icon
+          fontSize="small"
+          sx={{ color: 'inherit', transition: 'color 0.2s' }}
         />
-      )}
-    </Paper>
-  ),
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: isActive ? 600 : 400,
+            fontSize: '13px',
+            color: 'inherit',
+            lineHeight: 1,
+          }}
+        >
+          {label}
+        </Typography>
+        {hasIndicator && (
+          <Box
+            sx={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              bgcolor: isActive ? theme.palette.primary.main : 'success.main',
+              position: 'absolute',
+              top: 5,
+              right: 5,
+              boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+            }}
+          />
+        )}
+      </Box>
+    )
+  },
 )
 
 interface TabDescriptionProps {
@@ -100,43 +119,52 @@ interface TabDescriptionProps {
 
 // 描述文本组件
 const TabDescription: FC<TabDescriptionProps> = memo(
-  ({ description, tooltipTitle }) => (
-    <Fade in={true} timeout={200}>
-      <Typography
-        variant="caption"
-        component="div"
-        sx={{
-          width: '95%',
-          textAlign: 'center',
-          color: 'text.secondary',
-          p: 0.8,
-          borderRadius: 1,
-          borderColor: 'primary.main',
-          borderWidth: 1,
-          borderStyle: 'solid',
-          backgroundColor: 'background.paper',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 0.5,
-          wordBreak: 'break-word',
-          hyphens: 'auto',
-        }}
-      >
-        {description}
-        <Tooltip title={tooltipTitle}>
-          <HelpOutlineRounded
-            sx={{ fontSize: 14, opacity: 0.7, flexShrink: 0 }}
-          />
-        </Tooltip>
-      </Typography>
-    </Fade>
-  ),
+  ({ description, tooltipTitle }) => {
+    const theme = useTheme()
+    const isDark = theme.palette.mode === 'dark'
+
+    return (
+      <Fade in={true} timeout={200}>
+        <Typography
+          variant="caption"
+          component="div"
+          sx={{
+            width: '95%',
+            textAlign: 'center',
+            color: 'text.secondary',
+            px: 1.5,
+            py: 0.8,
+            borderRadius: 1.5,
+            backgroundColor: alpha(
+              theme.palette.primary.main,
+              isDark ? 0.1 : 0.06,
+            ),
+            border: `1px solid ${alpha(theme.palette.primary.main, isDark ? 0.2 : 0.12)}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0.5,
+            wordBreak: 'break-word',
+            hyphens: 'auto',
+            lineHeight: 1.5,
+          }}
+        >
+          {description}
+          <Tooltip title={tooltipTitle}>
+            <HelpOutlineRounded
+              sx={{ fontSize: 14, opacity: 0.7, flexShrink: 0 }}
+            />
+          </Tooltip>
+        </Typography>
+      </Fade>
+    )
+  },
 )
 
 export const ProxyTunCard: FC = () => {
   const { t } = useTranslation()
   const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
   const [activeTab, setActiveTab] = useState<string>(
     () => localStorage.getItem(LOCAL_STORAGE_TAB_KEY) || 'system',
   )
@@ -183,15 +211,21 @@ export const ProxyTunCard: FC = () => {
   ])
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+    <Box
+      sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 1.5 }}
+    >
+      {/* iOS-style segmented control tabs */}
       <Stack
         direction="row"
-        spacing={1}
+        spacing={0.5}
         sx={{
           display: 'flex',
           justifyContent: 'center',
-          position: 'relative',
-          zIndex: 2,
+          bgcolor: isDark
+            ? 'rgba(118, 118, 128, 0.24)'
+            : 'rgba(118, 118, 128, 0.12)',
+          borderRadius: 2,
+          p: 0.5,
         }}
       >
         <TabButton
@@ -210,14 +244,12 @@ export const ProxyTunCard: FC = () => {
         />
       </Stack>
 
+      {/* Tab description */}
       <Box
         sx={{
           width: '100%',
-          my: 1,
-          position: 'relative',
           display: 'flex',
           justifyContent: 'center',
-          overflow: 'visible',
         }}
       >
         <TabDescription
@@ -226,12 +258,13 @@ export const ProxyTunCard: FC = () => {
         />
       </Box>
 
+      {/* Proxy control switches */}
       <Box
         sx={{
-          mt: 0,
-          p: 1,
-          bgcolor: alpha(theme.palette.primary.main, 0.04),
+          p: 1.25,
+          bgcolor: alpha(theme.palette.primary.main, isDark ? 0.06 : 0.04),
           borderRadius: 2,
+          border: `1px solid ${alpha(theme.palette.primary.main, isDark ? 0.1 : 0.06)}`,
         }}
       >
         <ProxyControlSwitches

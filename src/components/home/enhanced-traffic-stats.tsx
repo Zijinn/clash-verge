@@ -54,6 +54,7 @@ declare global {
 const CompactStatCard = memo(
   ({ icon, title, value, unit, color, onClick }: StatCardProps) => {
     const theme = useTheme()
+    const isDark = theme.palette.mode === 'dark'
 
     // 获取调色板颜色 - 使用useMemo避免重复计算
     const colorValue = useMemo(() => {
@@ -74,17 +75,34 @@ const CompactStatCard = memo(
         sx={{
           display: 'flex',
           alignItems: 'center',
-          borderRadius: 2,
-          bgcolor: alpha(colorValue, 0.05),
-          border: `1px solid ${alpha(colorValue, 0.15)}`,
-          padding: '8px',
+          borderRadius: 2.5,
+          bgcolor: isDark
+            ? 'rgba(44, 44, 46, 0.95)'
+            : 'rgba(255, 255, 255, 0.95)',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'}`,
+          boxShadow: isDark
+            ? '0 1px 4px rgba(0,0,0,0.3)'
+            : '0 1px 4px rgba(0,0,0,0.06)',
+          padding: '10px',
           transition: 'all 0.2s ease-in-out',
           cursor: onClick ? 'pointer' : 'default',
+          overflow: 'hidden',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 2,
+            background: `linear-gradient(90deg, ${colorValue}, ${alpha(colorValue, 0.4)})`,
+          },
           '&:hover': onClick
             ? {
-                bgcolor: alpha(colorValue, 0.1),
-                border: `1px solid ${alpha(colorValue, 0.3)}`,
-                boxShadow: `0 4px 8px rgba(0,0,0,0.05)`,
+                transform: 'translateY(-1px)',
+                boxShadow: isDark
+                  ? '0 4px 12px rgba(0,0,0,0.4)'
+                  : '0 4px 12px rgba(0,0,0,0.1)',
               }
             : {},
         }}
@@ -99,11 +117,12 @@ const CompactStatCard = memo(
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            bgcolor: alpha(colorValue, 0.1),
+            width: 30,
+            height: 30,
+            borderRadius: 1.5,
+            bgcolor: alpha(colorValue, isDark ? 0.18 : 0.1),
             color: colorValue,
+            flexShrink: 0,
           }}
         >
           {icon}
@@ -111,22 +130,31 @@ const CompactStatCard = memo(
 
         {/* 文本内容 */}
         <Grid component="div" sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography variant="caption" color="text.secondary" noWrap>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            noWrap
+            sx={{ fontSize: '11px', lineHeight: 1.2 }}
+          >
             {title}
           </Typography>
           <Grid
             component="div"
-            sx={{ display: 'flex', alignItems: 'baseline' }}
+            sx={{ display: 'flex', alignItems: 'baseline', mt: 0.25 }}
           >
             <Typography
-              variant="body1"
-              fontWeight="bold"
+              variant="body2"
+              fontWeight={700}
               noWrap
-              sx={{ mr: 0.5 }}
+              sx={{ mr: 0.5, fontSize: '14px', color: colorValue }}
             >
               {value}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontSize: '11px' }}
+            >
               {unit}
             </Typography>
           </Grid>
@@ -194,15 +222,20 @@ export const EnhancedTrafficStats = () => {
   const trafficGraphComponent = useMemo(() => {
     if (!trafficGraph || !pageVisible) return null
 
+    const isDark = theme.palette.mode === 'dark'
     return (
       <Paper
         elevation={0}
         sx={{
           height: 130,
           cursor: 'pointer',
-          border: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-          borderRadius: 2,
+          borderRadius: 2.5,
           overflow: 'hidden',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)'}`,
+          boxShadow: isDark
+            ? '0 2px 8px rgba(0,0,0,0.35)'
+            : '0 2px 8px rgba(0,0,0,0.07)',
+          bgcolor: isDark ? 'rgba(44,44,46,0.95)' : 'rgba(255,255,255,0.95)',
         }}
         onClick={() => trafficRef.current?.toggleStyle()}
       >
@@ -211,7 +244,7 @@ export const EnhancedTrafficStats = () => {
         </div>
       </Paper>
     )
-  }, [trafficGraph, pageVisible, theme.palette.divider])
+  }, [trafficGraph, pageVisible, theme.palette.mode])
 
   // 使用useMemo计算统计卡片配置
   const statCards = useMemo(

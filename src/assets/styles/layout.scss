@@ -26,6 +26,11 @@
       -ms-user-select: none;
       overflow: hidden;
       border-right: 1px solid var(--divider-color);
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        var(--background-color-alpha) 100%
+      );
 
       .the-logo {
         position: relative;
@@ -168,7 +173,7 @@
 .layout.layout--nav-collapsed {
   --layout-nav-collapsed-width: 72px;
   --layout-nav-item-size: 52px;
-  --layout-nav-item-radius: 12px;
+  --layout-nav-item-radius: 14px;
   --layout-nav-logo-size: 56px;
 
   .layout-content {
@@ -243,9 +248,13 @@
           flex: 0 0 var(--layout-nav-item-size) !important;
           flex-grow: 0 !important;
           flex-shrink: 0 !important;
-          margin: 6px auto !important;
+          margin: 4px auto !important;
           padding: 0 !important;
           border-radius: var(--layout-nav-item-radius) !important;
+        }
+
+        .MuiListItemButton-root.Mui-selected::before {
+          display: none !important;
         }
 
         .MuiListItemIcon-root {
