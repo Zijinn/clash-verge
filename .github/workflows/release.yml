@@ -45,7 +45,10 @@ jobs:
             exit 1
           fi
 
-      - name: Check tag and package.json version
+      # Version consistency check is intentionally skipped here so that any
+      # v*.*.* tag pushed from the dev branch will trigger a release build.
+      # The tag version and package.json version are logged for reference only.
+      - name: Log tag and package.json version
         run: |
           TAG_REF="${GITHUB_REF_NAME:-${GITHUB_REF##*/}}"
           echo "Current tag: $TAG_REF"
@@ -53,16 +56,7 @@ jobs:
           PKG_VERSION=$(jq -r .version package.json)
           echo "package.json version: $PKG_VERSION"
 
-          EXPECTED_TAG="v$PKG_VERSION"
-
-          if [[ "$TAG_REF" != "$EXPECTED_TAG" ]]; then
-            echo "❌ Version mismatch:"
-            echo "   Git tag       : $TAG_REF"
-            echo "   package.json  : $EXPECTED_TAG"
-            exit 1
-          fi
-
-          echo "✅ Tag and package.json version are consistent."
+          echo "ℹ️ Tag: $TAG_REF, package.json version: v$PKG_VERSION"
 
   update_tag:
     name: Update tag
